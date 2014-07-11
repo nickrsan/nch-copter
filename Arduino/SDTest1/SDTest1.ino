@@ -1,3 +1,5 @@
+//Test reading from DHT sensors and writing to SD card
+
 #include <stdarg.h>
 #include <DHT.h>
 #include <SD.h>
@@ -101,8 +103,44 @@ void safe_output(char *fmt, ... )
 }
 */
 
-void printReadings(File theFile, float theTemperature, float theHumidity)
+void saveReadings(File theFile, char* sensor, unsigned long time, float theTemperature, float theHumidity)
 {
+  //opening brace
+  theFile.println("{");
+  
+  //time
+  theFile.print("\t\"time\": \"");
+  theFile.print(time);
+  theFile.println("\",");
+  
+  //sensor name
+  theFile.print("\t\"sensor\": \"");
+  theFile.print(sensor);
+  theFile.println("\",");
+  
+  //sensor name
+  theFile.print("\t\"temp\": \"");
+  theFile.print(theTemperature);
+  theFile.println("\",");
+  
+  //sensor name
+  theFile.print("\t\"hum\": \"");
+  theFile.print(theHumidity);
+  theFile.println("\",");
+  
+  //closing brace
+  theFile.println("}");
+  
+  theFile.flush();
+  
+  Serial.print(sensor);
+  Serial.print(": ");
+  Serial.print(time);
+  Serial.print(" ");
+  Serial.print(theTemperature);
+  Serial.print(" ");
+  Serial.println(theHumidity);
+  Serial.flush();
 }
 
 void loop ()
@@ -111,7 +149,9 @@ void loop ()
 	{
 		//safe_output("%s\n", float_to_string(5.0));
 		//safe_output("%s %f %f\n", dht_1.getStatusString(), dht_1.toFahrenheit(dht_1.getTemperature()), dht_1.getHumidity());
-                
+                saveReadings(datafile, "dht_1", millis(), dht_1.toFahrenheit(dht_1.getTemperature()), dht_1.getHumidity());
+                saveReadings(datafile, "dht_2", millis(), dht_2.toFahrenheit(dht_2.getTemperature()), dht_2.getHumidity());
+/*
 		Serial.print("dht_1 ");
 		datafile.print("dht_1 ");
                 Serial.print(millis());
@@ -140,6 +180,7 @@ void loop ()
 		datafile.println(dht_2.getHumidity());
 		Serial.flush();
 		datafile.flush();
+*/
                 delay(delay_between_reads);
 	}
 }
